@@ -1,13 +1,16 @@
-// src/App.jsx
-import React from "react";
-import "./index.css";
-// Import the firebase file so it initializes when app loads
-import "./firebase";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Home from "./pages/Home";
 
 export default function App() {
   return (
-    <div className="app-root">
-      <h1>my name react</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
