@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: "labpilot-1c4e9.firebasestorage.app",
   messagingSenderId: "747117539626",
   appId: "1:747117539626:web:27dee5ded89d0284cb2e53",
-  measurementId: "G-1KCDQL7ZR4"
+  measurementId: "G-1KCDQL7ZR4",
 };
 
 const app = initializeApp(firebaseConfig);

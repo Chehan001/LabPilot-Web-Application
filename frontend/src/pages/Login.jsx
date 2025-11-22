@@ -13,7 +13,13 @@ import {
   Alert,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { motion } from "framer-motion";
 
+// UPDATED Admin Credentials
+const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_PASSWORD = "admin123";
+
+// Correct path to admin dashboard: /admin
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -30,6 +36,19 @@ export default function Login() {
       showMessage("warning", "Please enter email and password.");
       return;
     }
+
+    // ADMIN LOGIN CHECK
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      showMessage("success", "Admin login successful!");
+
+      // Store admin flag in localStorage
+      localStorage.setItem("admin", "true");
+
+      setTimeout(() => navigate("/admin"), 800);
+      return;
+    }
+
+    // NORMAL USER LOGIN (Firebase)
     try {
       await loginUser(email, password);
       showMessage("success", "Login successful!");
@@ -43,75 +62,134 @@ export default function Login() {
     <Container
       maxWidth="xs"
       sx={{
-        display: "flex",
         minHeight: "100vh",
+        display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <Paper
-        elevation={8}
-        sx={{
-          p: 4,
-          borderRadius: "20px",
-          backgroundColor: "#fff",
-          textAlign: "center",
-        }}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        style={{ width: "100%" }}
       >
-        <Avatar
-          sx={{ bgcolor: "#2196f3", mx: "auto", mb: 2, width: 60, height: 60 }}
-        >
-          <LockOutlinedIcon fontSize="large" />
-        </Avatar>
-
-        <Typography variant="h5" fontWeight="bold" color="#1976d2" mb={2}>
-          Sign In
-        </Typography>
-
-        <Divider sx={{ mb: 2 }} />
-
-        {message.text && <Alert severity={message.type}>{message.text}</Alert>}
-
-        <TextField
-          fullWidth
-          label="University Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          sx={{ mb: 3 }}
-        />
-
-        <Button
-          fullWidth
-          variant="contained"
+        <Paper
+          elevation={6}
           sx={{
-            backgroundColor: "#1976d2",
-            "&:hover": { backgroundColor: "#1565c0" },
-            mb: 2,
-            py: 1.2,
-            fontWeight: "bold",
+            p: 4,
+            borderRadius: "25px",
+            textAlign: "center",
+            background: "rgba(255, 255, 255, 0.12)",
+            backdropFilter: "blur(15px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           }}
-          onClick={login}
         >
-          Login
-        </Button>
+          <Avatar
+            sx={{
+              bgcolor: "rgba(255,255,255,0.25)",
+              color: "#fff",
+              mx: "auto",
+              mb: 2,
+              width: 65,
+              height: 65,
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <LockOutlinedIcon fontSize="large" />
+          </Avatar>
 
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            <Link to="/signup" style={{ color: "#1976d2" }}>
-               Sign Up
-            </Link>
+          <Typography variant="h5" fontWeight="bold" color="#fff" mb={2}>
+            Welcome Back
+          </Typography>
+
+          <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.3)" }} />
+
+          {message.text && (
+            <Alert severity={message.type} sx={{ mb: 2 }}>
+              {message.text}
+            </Alert>
+          )}
+
+          <TextField
+            fullWidth
+            label="University Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputLabelProps={{
+              sx: {
+                color: "rgba(0, 0, 0, 0.7)",
+                "&.Mui-focused": { color: "#0c0472ff" },
+              },
+            }}
+            InputProps={{
+              sx: {
+                backgroundColor: "rgba(255,255,255,0.85)",
+                borderRadius: "10px",
+              },
+            }}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputLabelProps={{
+              sx: {
+                color: "rgba(0, 0, 0, 0.7)",
+                "&.Mui-focused": { color: "#0c0472ff" },
+              },
+            }}
+            InputProps={{
+              sx: {
+                backgroundColor: "rgba(255,255,255,0.85)",
+                borderRadius: "10px",
+              },
+            }}
+            sx={{ mb: 3 }}
+          />
+
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{
+              background: "linear-gradient(90deg, #1565c0, #42a5f5)",
+              "&:hover": {
+                background: "linear-gradient(90deg, #0d47a1, #1976d2)",
+              },
+              py: 1.4,
+              fontWeight: "bold",
+              borderRadius: "10px",
+              mb: 2,
+            }}
+            onClick={login}
+          >
+            Login
+          </Button>
+
+          <Grid container justifyContent="center">
+            <Grid item>
+              <Typography sx={{ color: "#fff" }}>
+                Don't have an account?{" "}
+                <Link
+                  to="/signup"
+                  style={{
+                    color: "#fff",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Sign Up
+                </Link>
+              </Typography>
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
+        </Paper>
+      </motion.div>
     </Container>
   );
 }
