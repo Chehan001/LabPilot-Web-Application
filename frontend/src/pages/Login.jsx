@@ -15,11 +15,11 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { motion } from "framer-motion";
 
-// UPDATED Admin Credentials
+// Admin 
 const ADMIN_EMAIL = "admin@gmail.com";
 const ADMIN_PASSWORD = "admin123";
 
-// Correct path to admin dashboard: /admin
+// path --> admin dashboard
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -37,22 +37,41 @@ export default function Login() {
       return;
     }
 
-    // ADMIN LOGIN CHECK
+    //  ADMIN LOGIN 
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       showMessage("success", "Admin login successful!");
 
-      // Store admin flag in localStorage
+      //admin locally
       localStorage.setItem("admin", "true");
 
-      setTimeout(() => navigate("/admin"), 800);
+      // ALSO authenticate admin in Firebase to allow Firestore writes
+      try {
+        await loginUser(ADMIN_EMAIL, ADMIN_PASSWORD);
+      } catch (err) {
+        console.error("Admin Firebase login error:", err);
+      }
+
+      setTimeout(() => {
+        navigate("/admin");
+        window.location.reload(); // Ensures Firebase session is active
+      }, 800);
+
       return;
     }
 
-    // NORMAL USER LOGIN (Firebase)
+    // USER LOGIN 
     try {
-      await loginUser(email, password);
-      showMessage("success", "Login successful!");
-      setTimeout(() => navigate("/home"), 800);
+      const user = await loginUser(email, password);
+
+      // Ensure Firebase session exists
+      if (user && user.user) {
+        showMessage("success", "Login successful!");
+
+        setTimeout(() => {
+          navigate("/home");
+          window.location.reload(); // Important for Firestore access
+        }, 800);
+      }
     } catch (error) {
       showMessage("error", error.message);
     }
@@ -157,7 +176,7 @@ export default function Login() {
             fullWidth
             variant="contained"
             sx={{
-              background: "linear-gradient(90deg, #1565c0, #42a5f5)",
+              background: "linear-gradient(90deg, #8ebbeeff, #4e9ad8ff)",
               "&:hover": {
                 background: "linear-gradient(90deg, #0d47a1, #1976d2)",
               },

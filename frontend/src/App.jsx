@@ -11,19 +11,29 @@ import Timetable from "./pages/admin/Timetable";
 import Report from "./pages/admin/Report";
 import Attendance from "./pages/admin/Attendance";
 
+const AdminRoute = ({ children }) => {
+  const isAdmin = localStorage.getItem("admin");
+  return isAdmin ? children : <Navigate to="/login" />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
 
-        {/* Admin routes */}
-        <Route path="/admin/*" element={<Admin />}>
-          <Route index element={<AdminHome />} /> {/* default page */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminHome />} />
           <Route path="equipment" element={<Equipment />} />
           <Route path="chemical" element={<Chemical />} />
           <Route path="practicals" element={<Practicals />} />
