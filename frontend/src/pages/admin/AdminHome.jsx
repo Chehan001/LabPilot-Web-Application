@@ -18,17 +18,15 @@ import { motion } from "framer-motion";
 
 export default function AdminHome() {
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState({
-    add: {},
-    distribute: {},
-    receive: {},
-    damage: {},
-  });
 
+  //  Equipment Warrning Stock
   const [inventory, setInventory] = useState({});
-  const MIN_STOCK = 10; // alert threshold
+  const MIN_STOCK = 10;
 
-  // Sum items by name
+  //Chemical Warrning Stock
+  const [chemicalInventory, setChemicalInventory] = useState({});
+  const MIN_CHEM_STOCK = 50;
+
   const groupByName = (array) => {
     const map = {};
     array.forEach((item) => {
@@ -41,6 +39,7 @@ export default function AdminHome() {
 
   const fetchSummary = async () => {
     try {
+      // Equipment Summary
       const addSnap = await getDocs(collection(db, "addEquipment"));
       const distributeSnap = await getDocs(
         collection(db, "distributeEquipment")
@@ -73,14 +72,6 @@ export default function AdminHome() {
       const groupedReceive = groupByName(receiveList);
       const groupedDamage = groupByName(damageList);
 
-      setSummary({
-        add: groupedAdd,
-        distribute: groupedDistribute,
-        receive: groupedReceive,
-        damage: groupedDamage,
-      });
-
-      // Combine all equipment names
       const allNames = new Set([
         ...Object.keys(groupedAdd),
         ...Object.keys(groupedDistribute),
@@ -88,7 +79,6 @@ export default function AdminHome() {
         ...Object.keys(groupedDamage),
       ]);
 
-      // Calculate stock
       const inventoryCalc = {};
       allNames.forEach((name) => {
         const totalAdd = groupedAdd[name] || 0;
@@ -107,6 +97,55 @@ export default function AdminHome() {
       });
 
       setInventory(inventoryCalc);
+
+      // CHEMICAL 
+      const chemAddSnap = await getDocs(collection(db, "addChemical"));
+      const chemDistSnap = await getDocs(
+        collection(db, "distributeChemical")
+      );
+      const chemReceiveSnap = await getDocs(
+        collection(db, "receiveChemical")
+      );
+
+      const chemAddList = chemAddSnap.docs.map((doc) => ({
+        name: doc.data().chemicalName,
+        count: doc.data().quantity,
+      }));
+
+      const chemDistributeList = chemDistSnap.docs.map((doc) => ({
+        name: doc.data().chemicalName,
+        count: doc.data().quantity,
+      }));
+
+      const chemReceiveList = chemReceiveSnap.docs.map((doc) => ({
+        name: doc.data().chemicalName,
+        count: doc.data().quantity,
+      }));
+
+      const chemGroupedAdd = groupByName(chemAddList);
+      const chemGroupedDist = groupByName(chemDistributeList);
+      const chemGroupedReceive = groupByName(chemReceiveList);
+
+      const allChem = new Set([
+        ...Object.keys(chemGroupedAdd),
+        ...Object.keys(chemGroupedDist),
+        ...Object.keys(chemGroupedReceive),
+      ]);
+
+      const chemInventoryCalc = {};
+      allChem.forEach((name) => {
+        const totalAdd = chemGroupedAdd[name] || 0;
+        const totalDist = chemGroupedDist[name] || 0;
+        const totalRec = chemGroupedReceive[name] || 0;
+
+        chemInventoryCalc[name] = {
+          available: totalAdd - totalDist + totalRec,
+          distributed: totalDist,
+        };
+      });
+
+      setChemicalInventory(chemInventoryCalc);
+
       setLoading(false);
     } catch (err) {
       console.error("Error loading summary:", err);
@@ -140,6 +179,7 @@ export default function AdminHome() {
           backgroundColor: "#ffffff",
         }}
       >
+        {/* TITLE */}
         <Typography
           variant="h4"
           textAlign="center"
@@ -157,8 +197,8 @@ export default function AdminHome() {
           </Box>
         ) : (
           <>
+            {/*  EQUIPMENT CARDS */}
             <Grid container spacing={3}>
-              {/* Total Available Stock */}
               <Grid item xs={12} md={4}>
                 <MotionCard>
                   <Paper
@@ -175,7 +215,6 @@ export default function AdminHome() {
                 </MotionCard>
               </Grid>
 
-              {/* Total Distributed */}
               <Grid item xs={12} md={4}>
                 <MotionCard>
                   <Paper
@@ -192,7 +231,6 @@ export default function AdminHome() {
                 </MotionCard>
               </Grid>
 
-              {/* Total Damaged */}
               <Grid item xs={12} md={4}>
                 <MotionCard>
                   <Paper
@@ -210,15 +248,8 @@ export default function AdminHome() {
               </Grid>
             </Grid>
 
-            {/* Equipment Stock Analysis */}
-            <Paper
-              sx={{
-                mt: 4,
-                p: 3,
-                borderRadius: 3,
-                backgroundColor: "#f2faffff",
-              }}
-            >
+            {/* Equipment Stock*/}
+            <Paper sx={{ mt: 4, p: 3, borderRadius: 3, backgroundColor: "#f2faffff" }}>
               <Typography variant="h6" fontWeight="bold" mb={2}>
                 Equipment Stock Analysis
               </Typography>
@@ -227,18 +258,10 @@ export default function AdminHome() {
                 <Table>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: "#c6e3f9ff" }}>
-                      <TableCell>
-                        <strong>Equipment Name</strong>
-                      </TableCell>
-                      <TableCell align="center">
-                        <strong>Available</strong>
-                      </TableCell>
-                      <TableCell align="center">
-                        <strong>Distributed</strong>
-                      </TableCell>
-                      <TableCell align="center">
-                        <strong>Damaged</strong>
-                      </TableCell>
+                      <TableCell><strong>Equipment Name</strong></TableCell>
+                      <TableCell align="center"><strong>Available</strong></TableCell>
+                      <TableCell align="center"><strong>Distributed</strong></TableCell>
+                      <TableCell align="center"><strong>Damaged</strong></TableCell>
                     </TableRow>
                   </TableHead>
 
@@ -257,20 +280,109 @@ export default function AdminHome() {
                         <TableCell
                           align="center"
                           style={{
-                            color: data.available <= MIN_STOCK ? "#d32f2f" : "",
+                            color: data.available <= MIN_STOCK ? "#e12525ff" : "",
                             fontWeight:
                               data.available <= MIN_STOCK ? "bold" : "normal",
                           }}
                         >
                           {data.available}
                         </TableCell>
-                        <TableCell align="center">
-                          {data.distributed}
-                        </TableCell>
+                        <TableCell align="center">{data.distributed}</TableCell>
                         <TableCell align="center">{data.damaged}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+
+            {/*  Chemical Stock  */}
+            <Typography
+              variant="h4"
+              textAlign="center"
+              fontWeight="bold"
+              mt={6}
+              mb={3}
+            >
+              Chemical Inventory Overview
+            </Typography>
+
+            {/* CHEMICAL CARDS */}
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <MotionCard>
+                  <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: "#e8f5e9" }}>
+                    <Typography variant="h6">Total Chemical Stock</Typography>
+                    <Typography variant="h3" fontWeight="bold" mt={1}>
+                      {Object.values(chemicalInventory).reduce(
+                        (acc, i) => acc + i.available,
+                        0
+                      )}
+                    </Typography>
+                  </Paper>
+                </MotionCard>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <MotionCard>
+                  <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: "#fff3e0" }}>
+                    <Typography variant="h6">Total Distributed</Typography>
+                    <Typography variant="h3" fontWeight="bold" mt={1}>
+                      {Object.values(chemicalInventory).reduce(
+                        (acc, i) => acc + i.distributed,
+                        0
+                      )}
+                    </Typography>
+                  </Paper>
+                </MotionCard>
+              </Grid>
+            </Grid>
+
+            {/* CHEMICAL TABLE */}
+            <Paper sx={{ mt: 4, p: 3, borderRadius: 3, backgroundColor: "#eef7ff" }}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Chemical Stock Analysis
+              </Typography>
+
+              <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: "#bbdefb" }}>
+                      <TableCell><strong>Chemical Name</strong></TableCell>
+                      <TableCell align="center"><strong>Available</strong></TableCell>
+                      <TableCell align="center"><strong>Distributed</strong></TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {Object.entries(chemicalInventory).map(([name, data]) => (
+                      <TableRow
+                        key={name}
+                        sx={{
+                          backgroundColor:
+                            data.available <= MIN_CHEM_STOCK
+                              ? "rgba(255,0,0,0.15)"
+                              : "inherit",
+                        }}
+                      >
+                        <TableCell>{name}</TableCell>
+
+                        <TableCell
+                          align="center"
+                          style={{
+                            color: data.available <= MIN_CHEM_STOCK ? "#c75555ff" : "",
+                            fontWeight:
+                              data.available <= MIN_CHEM_STOCK ? "bold" : "normal",
+                          }}
+                        >
+                          {data.available}
+                        </TableCell>
+
+                        <TableCell align="center">{data.distributed}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+
                 </Table>
               </TableContainer>
             </Paper>
