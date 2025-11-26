@@ -216,7 +216,7 @@ export default function AdminHome() {
                 mt: 4,
                 p: 3,
                 borderRadius: 3,
-                backgroundColor: "#e3f2fd",
+                backgroundColor: "#f2faffff",
               }}
             >
               <Typography variant="h6" fontWeight="bold" mb={2}>
@@ -226,7 +226,7 @@ export default function AdminHome() {
               <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
                 <Table>
                   <TableHead>
-                    <TableRow sx={{ backgroundColor: "#bbdefb" }}>
+                    <TableRow sx={{ backgroundColor: "#c6e3f9ff" }}>
                       <TableCell>
                         <strong>Equipment Name</strong>
                       </TableCell>
