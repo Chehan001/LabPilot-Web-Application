@@ -312,7 +312,6 @@ export default function Attendance() {
           textTransform: "none",
           fontSize: "1.05rem",
           fontWeight: 600,
-          background: gradient,
           background: "linear-gradient(90deg, #1976d2, #42a5f5)",
           boxShadow: "0 4px 20px rgba(25, 118, 210, 0.4)",
 

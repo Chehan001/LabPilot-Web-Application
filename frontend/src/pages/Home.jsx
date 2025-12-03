@@ -1,57 +1,69 @@
 import { useEffect, useState } from "react";
 import { auth } from "../firebase/config";
-import { Box, Typography, Paper, Alert } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import UserNavBar from "../pages/UserNavBar";
 import Working from "../pages/Working";
+import UserProfile from "../pages/UserProfile";
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [notice, setNotice] = useState(
-    "No special notices at the moment."
-  );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
+    const unsubscribe = auth.onAuthStateChanged((u) => {
+      setUser(u);
+      setLoading(false);
+    });
     return () => unsubscribe();
   }, []);
 
+  if (loading)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        }}
+      >
+        <CircularProgress size={40} sx={{ color: "#667eea" }} />
+      </Box>
+    );
+
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+      }}
+    >
       <UserNavBar />
+      
+      <Box
+        sx={{
+          ml: { xs: 0, md: "260px" },
+          p: { xs: 2, sm: 3, md: 5 },
+          width: "100%",
+          transition: "margin 0.3s ease",
+        }}
+      >
 
-      <Box sx={{ ml: "260px", p: 4, width: "100%" }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
-          Home
-        </Typography>
-
-       
-
-        {/* ROW: Notice (left) + Working Hours (right) */}
+        {/* Content Grid */}
         <Box
           sx={{
-            display: "flex",
-            gap: 4,
-            flexWrap: "wrap",
-            alignItems: "flex-start",
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              lg: "1fr 400px",
+            },
+            gap: 2,
+            alignItems: "start",
           }}
         >
-          {/* NOTICE CARD */}
-          <Paper
-            sx={{
-              p: 3,
-              width: "100%",
-              maxWidth: "500px",
-              borderRadius: 3,
-              background: "#fff",
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              Special Notice
-            </Typography>
-            <Typography sx={{ color: "#555" }}>{notice}</Typography>
-          </Paper>
-
-          {/* WORKING HOURS CARD */}
+          {user && <UserProfile />}
           <Working />
         </Box>
       </Box>

@@ -21,9 +21,9 @@ export default function UserNavBar() {
 
   const navItems = [
     { label: "Home", path: "/", icon: Home },
-    { label: "Practicals", path: "/practicals", icon: FlaskConical },
-    { label: "Attendance", path: "/attendance", icon: CheckCircle },
-    { label: "Reports", path: "/reports", icon: BarChart3 },
+    { label: "Practicals", path: "/upracticals", icon: FlaskConical },
+    { label: "Attendance", path: "/uattendance", icon: CheckCircle },
+    { label: "Reports", path: "/ureports", icon: BarChart3 },
   ];
 
   // SIDEBAR WIDTH
@@ -149,20 +149,9 @@ export default function UserNavBar() {
   return (
     <div
       style={styles.sidebar}
-      onMouseLeave={() => setIsOpen(false)}  // auto-close
+      onMouseLeave={() => setIsOpen(false)}  
     >
-      {/* HEADER */}
-      <div style={styles.header}>
-        <div style={styles.headerContent}>
-          <div style={styles.avatar}>U</div>
-          <div>
-            <h2 style={styles.title}>User Panel</h2>
-            <p style={styles.subtitle}>Student Dashboard</p>
-          </div>
-        </div>
-      </div>
-
-      {/* NAV */}
+      {/* NavBar*/}
       <nav style={styles.nav}>
         {navItems.map((item) => {
           const Icon = item.icon;
