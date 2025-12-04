@@ -5,10 +5,10 @@ export default function UserNavBar() {
   const [activeItem, setActiveItem] = useState('/');
   const [hoveredItem, setHoveredItem] = useState(null);
 
-  // NEW: sidebar visibility state
+  //sidebar visibility state
   const [isOpen, setIsOpen] = useState(false);
 
-  // Detect mouse near left edge to open sidebar
+  // Detect --> mouse near left edge to open sidebar
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (e.clientX < 40) {
@@ -21,12 +21,12 @@ export default function UserNavBar() {
 
   const navItems = [
     { label: "Home", path: "/", icon: Home },
-    { label: "Practicals", path: "/upracticals", icon: FlaskConical },
-    { label: "Attendance", path: "/uattendance", icon: CheckCircle },
-    { label: "Reports", path: "/ureports", icon: BarChart3 },
+    { label: "Practicals", path: "/practicals", icon: FlaskConical },
+    { label: "Attendance", path: "/attendance", icon: CheckCircle },
+    { label: "Reports", path: "/reports", icon: BarChart3 },
   ];
 
-  // SIDEBAR WIDTH
+  // Sidebar styles
   const expandedWidth = 280;
   const collapsedWidth = 60;
 
@@ -151,7 +151,18 @@ export default function UserNavBar() {
       style={styles.sidebar}
       onMouseLeave={() => setIsOpen(false)}  
     >
-      {/* NavBar*/}
+      {/* HEADER */}
+      <div style={styles.header}>
+        <div style={styles.headerContent}>
+          <div style={styles.avatar}>U</div>
+          <div>
+            <h2 style={styles.title}>User Panel</h2>
+            <p style={styles.subtitle}>Student Dashboard</p>
+          </div>
+        </div>
+      </div>
+
+      {/* NAV */}
       <nav style={styles.nav}>
         {navItems.map((item) => {
           const Icon = item.icon;

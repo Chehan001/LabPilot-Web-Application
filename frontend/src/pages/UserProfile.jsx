@@ -37,7 +37,7 @@ export default function UserProfile() {
   const [error, setError] = useState("");
   const [profileExists, setProfileExists] = useState(false);
 
-  // Fetch -->  current user profile
+  // Fetch current user profile
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (u) => {
       setUser(u);
@@ -62,7 +62,7 @@ export default function UserProfile() {
     return () => unsub();
   }, []);
 
-  // Convert --> image to Base64
+  // Convert image to Base64
   const handleFileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -71,7 +71,7 @@ export default function UserProfile() {
       reader.onerror = (error) => reject(error);
     });
 
-  // Handle file selection
+  // Handle --> file selection
   const onFileChange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -79,7 +79,7 @@ export default function UserProfile() {
     setImagePreview(URL.createObjectURL(f));
   };
 
-  // Handle form submission
+  // Handle -->  form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -109,7 +109,7 @@ export default function UserProfile() {
         name: name.trim(),
         regNo: regNo.trim(),
         badge,
-        photoURL: photoBase64, // image --> Base64 stored directly
+        photoURL: photoBase64, // image -->  Base64 stored directly
         createdAt: new Date(),
       });
 

@@ -6,44 +6,50 @@ import { db } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function Working() {
-  const [hours, setHours] = useState({});
+  const [hours, setHours] = useState(null);
   const [today, setToday] = useState("");
-  const [holiday, setHoliday] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [holidayMessage, setHolidayMessage] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchHours = async () => {
       try {
-        const docRef = doc(db, "workingHours", "hours");
-        const docSnap = await getDoc(docRef);
+        const ref = doc(db, "workingHours", "hours");
+        const snap = await getDoc(ref);
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setHours(data);
-
-          const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-          const todayIndex = new Date().getDay();
-          const todayName = dayNames[todayIndex];
-          setToday(todayName);
-
-          const todayHoliday = data[todayName] === "Closed" ? "Closed" : data.holiday || "";
-          setHoliday(todayHoliday);
-        } else {
+        if (!snap.exists()) {
           setError("No working hours found in Firestore");
+          return;
         }
-      } catch (err) {
-        console.error("Fetch error:", err);
+
+        const data = snap.data();
+        setHours(data);
+
+        // Get --> today's name
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const todayName = dayNames[new Date().getDay()];
+        setToday(todayName);
+
+        // Holiday logic
+        if (data[todayName] === "Closed") {
+          setHolidayMessage("Closed");
+        } else if (data.holiday) {
+          setHolidayMessage(data.holiday);
+        }
+      } catch (e) {
         setError("Failed to fetch working hours");
+        console.error(e);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchHours();
   }, []);
 
-  if (isLoading)
+  /** Loading UI */
+  if (loading)
     return (
       <Paper
         elevation={0}
@@ -58,47 +64,28 @@ export default function Working() {
           minHeight: 200,
         }}
       >
-        <CircularProgress size={32} sx={{ color: "#667eea" }} />
+        <CircularProgress size={32} />
       </Paper>
     );
 
   if (error)
     return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          borderRadius: 4,
-          border: "1px solid #ef5350",
-          maxWidth: 400,
-        }}
-      >
-        <Alert severity="error" sx={{ borderRadius: 2 }}>
-          {error}
-        </Alert>
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: "1px solid #ef5350", maxWidth: 400 }}>
+        <Alert severity="error">{error}</Alert>
       </Paper>
     );
 
-  if (!hours || Object.keys(hours).length === 0) {
+  /** No hours found */
+  if (!hours)
     return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          borderRadius: 4,
-          border: "1px solid #ff9800",
-          maxWidth: 500,
-        }}
-      >
-        <Alert severity="warning" sx={{ borderRadius: 2 }}>
-          Unable to load hours. Check Firestore.
-        </Alert>
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: "1px solid #ff9800", maxWidth: 400 }}>
+        <Alert severity="warning">No working hours available.</Alert>
       </Paper>
     );
-  }
 
   const displayDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const isOpen = hours[today] !== "Closed" && !holiday;
+  const todayHours = hours[today];
+  const isOpen = todayHours !== "Closed" && !holidayMessage;
 
   return (
     <Paper
@@ -127,16 +114,16 @@ export default function Working() {
           <AccessTimeIcon sx={{ fontSize: 28, color: "#667eea" }} />
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1a1a1a", lineHeight: 1.2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
             Working Hours
           </Typography>
-          <Typography variant="body2" sx={{ color: "#666", fontSize: "0.875rem" }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
             Our schedule this week
           </Typography>
         </Box>
       </Box>
 
-      {/* Today's Status Alert */}
+      {/* Today's  */}
       <Alert
         severity={isOpen ? "success" : "info"}
         icon={isOpen ? <CheckCircleIcon /> : <AccessTimeIcon />}
@@ -144,17 +131,10 @@ export default function Working() {
           mb: 3,
           borderRadius: 2,
           border: `1px solid ${isOpen ? "#4caf50" : "#2196f3"}`,
-          backgroundColor: isOpen ? "#f1f8f4" : "#e3f2fd",
-          "& .MuiAlert-icon": {
-            color: isOpen ? "#2e7d32" : "#1565c0",
-          },
         }}
       >
-        <Typography sx={{ fontWeight: 600, fontSize: "0.95rem", color: isOpen ? "#2e7d32" : "#1565c0" }}>
-          Today: {today}
-        </Typography>
-        <Typography sx={{ fontSize: "0.9rem", color: isOpen ? "#1b5e20" : "#0d47a1" }}>
-          {holiday || (isOpen ? "We're open now!" : "Closed today")}
+        <Typography sx={{ fontWeight: 600 }}>
+          Today: {today} — {holidayMessage || todayHours}
         </Typography>
       </Alert>
 
@@ -164,7 +144,7 @@ export default function Working() {
       {/* Hours List */}
       <Box sx={{ display: "grid", gap: 1.5 }}>
         {displayDays.map((day) => {
-          const isToday = today === day;
+          const isToday = day === today;
           const dayHours = hours[day] || "Not set";
           const isClosed = dayHours === "Closed";
 
@@ -173,88 +153,27 @@ export default function Working() {
               key={day}
               sx={{
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "space-between",
                 p: 2,
                 borderRadius: 2,
-                backgroundColor: isToday ? "#f0f4ff" : "transparent",
                 border: isToday ? "2px solid #667eea" : "1px solid #f0f0f0",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  backgroundColor: isToday ? "#f0f4ff" : "#fafafa",
-                  transform: "translateX(4px)",
-                },
+                backgroundColor: isToday ? "#f0f4ff" : "transparent",
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                {/* Status Dot */}
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    backgroundColor: isToday ? "#667eea" : isClosed ? "#ef5350" : "#4caf50",
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontWeight: isToday ? 700 : 500,
-                    color: isToday ? "#667eea" : "#333",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {day}
-                </Typography>
-              </Box>
-
-              <Typography
-                sx={{
-                  fontWeight: isToday ? 600 : 400,
-                  color: isClosed ? "#ef5350" : isToday ? "#667eea" : "#666",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {dayHours}
-              </Typography>
+              <Typography sx={{ fontWeight: isToday ? 700 : 500 }}>{day}</Typography>
+              <Typography sx={{ color: isClosed ? "#ef5350" : "#333" }}>{dayHours}</Typography>
             </Box>
           );
         })}
       </Box>
 
       {/* Footer */}
-      <Box
-        sx={{
-          mt: 3,
-          p: 2,
-          backgroundColor: "#f9fafb",
-          borderRadius: 2,
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#666",
-            fontSize: "0.85rem",
-            textAlign: "center",
-            lineHeight: 1.6,
-          }}
-        >
-          Need to reach us outside these hours?
-          <br />
-          <Typography
-            component="span"
-            sx={{
-              color: "#667eea",
-              fontWeight: 600,
-              cursor: "pointer",
-              "&:hover": {
-                textDecoration: "underline",
-              },
-            }}
-          >
+      <Box sx={{ mt: 3, p: 2, backgroundColor: "#f9fafb", borderRadius: 2 }}>
+        <Typography sx={{ fontSize: "0.85rem", color: "#666", textAlign: "center" }}>
+          Need help?{" "}
+          <span style={{ color: "#667eea", cursor: "pointer", fontWeight: 600 }}>
             Contact support
-          </Typography>
+          </span>
         </Typography>
       </Box>
     </Paper>

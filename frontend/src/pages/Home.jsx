@@ -45,7 +45,7 @@ export default function Home() {
       <Box
         sx={{
           ml: { xs: 0, md: "260px" },
-          p: { xs: 2, sm: 3, md: 5 },
+          p: { xs: 2, sm: 3, md: 4 },
           width: "100%",
           transition: "margin 0.3s ease",
         }}
@@ -59,7 +59,7 @@ export default function Home() {
               xs: "1fr",
               lg: "1fr 400px",
             },
-            gap: 2,
+            gap: 4,
             alignItems: "start",
           }}
         >
