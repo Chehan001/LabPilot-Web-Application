@@ -146,12 +146,12 @@ export default function UserProfile() {
           elevation={0}
           sx={{
             p: 4,
-            borderRadius: 4,
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            borderRadius: 8,
+            background: "linear-gradient(135deg, #4e67d5ff 0%, #87a7edff 100%)",
             color: "white",
             position: "relative",
             overflow: "hidden",
-            maxWidth: 600,
+            maxWidth: 500,
             boxShadow: "0 20px 60px rgba(102, 126, 234, 0.3)",
           }}
         >
@@ -169,19 +169,6 @@ export default function UserProfile() {
           />
           <Box sx={{ position: "relative", zIndex: 1 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
-              <Typography variant="h5" sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}>
-                <PersonIcon /> Profile
-              </Typography>
-              <Chip
-                icon={<CheckCircleIcon />}
-                label="Verified"
-                size="small"
-                sx={{
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  color: "white",
-                  fontWeight: 600,
-                }}
-              />
             </Box>
             <Box
               sx={{
@@ -246,19 +233,6 @@ export default function UserProfile() {
                     }}
                   />
                 </Box>
-                <Alert
-                  severity="success"
-                  icon={<CheckCircleIcon />}
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "white",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    "& .MuiAlert-icon": { color: "white" },
-                  }}
-                >
-                  Profile is complete and locked for editing
-                </Alert>
               </Box>
             </Box>
           </Box>
@@ -369,9 +343,9 @@ export default function UserProfile() {
                   textTransform: "none",
                   fontSize: "1rem",
                   fontWeight: 600,
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  background: "linear-gradient(135deg, #667eea 0%, #7ca1f1ff 100%)",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #5568d3 0%, #65408d 100%)",
+                    background: "linear-gradient(135deg, #5568d3 0%, #7ca1f1ff 100%)",
                   },
                   "&:disabled": {
                     background: "#e0e0e0",

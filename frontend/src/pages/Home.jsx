@@ -37,11 +37,9 @@ export default function Home() {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        background: "linear-gradient(135deg, #bacff0ff 25%, #90aeddff 75%)",
       }}
     >
-      <UserNavBar />
-      
       <Box
         sx={{
           ml: { xs: 0, md: "260px" },

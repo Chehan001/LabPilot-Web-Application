@@ -1,7 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// Auth pages
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+
+// User pages
 import Home from "./pages/Home";
+import UserPracticals from "./pages/UserPracticals";
+import UserAttendance from "./pages/UserAttendance";
+import UserReports from "./pages/UserReports";
+import UserLayout from "./pages/UserLayout";
+
+// Admin pages
 import Admin from "./pages/admin/Admin";
 import AdminHome from "./pages/admin/AdminHome";
 import Equipment from "./pages/admin/Equipment";
@@ -11,20 +21,37 @@ import Timetable from "./pages/admin/Timetable";
 import Report from "./pages/admin/Report";
 import Attendance from "./pages/admin/Attendance";
 
+
+
+// Admin  Routes
 const AdminRoute = ({ children }) => {
   const isAdmin = localStorage.getItem("admin");
   return isAdmin ? children : <Navigate to="/login" />;
 };
-
+ 
+//Other Routes
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Redirect root → login */}
         <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
 
+        {/* User Routes */}
+         <Route element={<UserLayout />}>
+        <Route path="/home" element={<Home />} />
+        <Route path="/userpracticals" element={<UserPracticals />} />
+        <Route path="/userattendance" element={<UserAttendance />} />
+        <Route path="/userreports" element={<UserReports />} />
+        </Route>
+
+
+        {/* Admin Routes  */}
         <Route
           path="/admin/*"
           element={
@@ -41,6 +68,7 @@ export default function App() {
           <Route path="report" element={<Report />} />
           <Route path="attendance" element={<Attendance />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
   );

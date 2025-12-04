@@ -1,25 +1,42 @@
-import { useState, useEffect, useRef } from 'react';
-import { Home, FlaskConical, CheckCircle, BarChart3, ChevronRight, Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Home,
+  FlaskConical,
+  CheckCircle,
+  BarChart3,
+  ChevronRight,
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function UserNavBar() {
-  const [activeItem, setActiveItem] = useState('/');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [activeItem, setActiveItem] = useState(location.pathname);
   const [hoveredItem, setHoveredItem] = useState(null);
-  const [isOpen, setIsOpen] = useState(false); // Sidebar open state
-  const [isMobile, setIsMobile] = useState(false); // Mobile/tablet detection
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const sidebarRef = useRef();
+
+  // Update active item when route changes
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
 
   // Detect screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1024); // mobile/tablet breakpoint
+      setIsMobile(window.innerWidth <= 1024);
       if (window.innerWidth > 1024) {
-        setIsOpen(false); // reset mobile sidebar state on desktop
+        setIsOpen(false); 
       }
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Detect mouse near left edge (desktop only)
@@ -30,8 +47,8 @@ export default function UserNavBar() {
           setIsOpen(true);
         }
       };
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => window.removeEventListener('mousemove', handleMouseMove);
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
     }
   }, [isMobile]);
 
@@ -43,16 +60,16 @@ export default function UserNavBar() {
           setIsOpen(false);
         }
       };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isMobile, isOpen]);
 
   const navItems = [
-    { label: 'Home', path: '/', icon: Home },
-    { label: 'Practicals', path: '/practicals', icon: FlaskConical },
-    { label: 'Attendance', path: '/attendance', icon: CheckCircle },
-    { label: 'Reports', path: '/reports', icon: BarChart3 },
+    { label: "Home", path: "/home", icon: Home },
+    { label: "Practicals", path: "/userpracticals", icon: FlaskConical },
+    { label: "Attendance", path: "/userattendance", icon: CheckCircle },
+    { label: "Reports", path: "/userreports", icon: BarChart3 },
   ];
 
   const expandedWidth = 280;
@@ -60,81 +77,83 @@ export default function UserNavBar() {
 
   const styles = {
     sidebar: {
-      width: isOpen ? expandedWidth + 'px' : collapsedWidth + 'px',
-      transition: 'width 0.35s ease',
-      height: '100vh',
-      background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
-      color: 'white',
-      padding: '24px 16px',
-      position: isMobile ? 'fixed' : 'fixed',
-      left: isOpen || !isMobile ? 0 : '-100%',
+      width: isOpen ? expandedWidth + "px" : collapsedWidth + "px",
+      transition: "width 0.35s ease",
+      height: "100vh",
+      background: "linear-gradient(180deg, #89ace6ff 0%, #0f172a 100%)",
+      color: "white",
+      padding: "24px 16px",
+      position: "fixed",
+      left: isOpen || !isMobile ? 0 : "-100%",
       top: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      boxShadow: isMobile ? '4px 0 20px rgba(0,0,0,0.5)' : '4px 0 20px rgba(0,0,0,0.3)',
+      display: "flex",
+      flexDirection: "column",
+      boxShadow: isMobile
+        ? "4px 0 20px rgba(0,0,0,0.5)"
+        : "4px 0 20px rgba(0,0,0,0.3)",
       zIndex: 1000,
-      overflow: 'hidden',
+      overflow: "hidden",
     },
     topBar: {
-      display: isMobile ? 'flex' : 'none',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '12px 16px',
-      color: 'white',
-      position: 'fixed',
+      display: isMobile ? "flex" : "none",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "12px 16px",
+      color: "white",
+      position: "fixed",
       top: 0,
       right: -15,
       zIndex: 1001,
     },
     nav: {
       flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px',
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
     },
     navButton: (isActive) => ({
-      width: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      padding: '14px 16px',
-      borderRadius: '12px',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      padding: "14px 16px",
+      borderRadius: "12px",
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
       background: isActive
-        ? 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)'
-        : 'transparent',
-      transform: isActive ? 'translateX(4px)' : 'translateX(0)',
-      boxShadow: isActive ? '0 4px 12px rgba(168, 85, 247, 0.3)' : 'none',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
+        ? "linear-gradient(135deg, #253b9fff 0%, #71a9eeff 100%)"
+        : "transparent",
+      transform: isActive ? "translateX(4px)" : "translateX(0)",
+      boxShadow: isActive ? "0 4px 12px rgba(6, 33, 155, 0.3)" : "none",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
     }),
     label: (isActive) => ({
-      fontWeight: isActive ? '600' : '500',
-      fontSize: '15px',
+      fontWeight: isActive ? "600" : "500",
+      fontSize: "15px",
       flex: 1,
-      textAlign: 'left',
-      color: isActive ? 'white' : 'rgba(255,255,255,0.85)',
+      textAlign: "left",
+      color: isActive ? "white" : "rgba(255,255,255,0.85)",
       opacity: isOpen ? 1 : 0,
-      transition: 'opacity .3s ease',
+      transition: "opacity .3s ease",
     }),
     iconWrapper: (isActive) => ({
-      display: 'flex',
-      color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
-      transition: 'color 0.3s ease',
+      display: "flex",
+      color: isActive ? "white" : "rgba(255,255,255,0.7)",
+      transition: "color 0.3s ease",
       zIndex: 10,
     }),
     footer: {
-      paddingTop: '24px',
-      borderTop: '1px solid rgba(255,255,255,0.1)',
+      paddingTop: "24px",
+      borderTop: "1px solid rgba(255,255,255,0.1)",
       opacity: isOpen ? 1 : 0,
-      transition: 'opacity .3s ease',
+      transition: "opacity .3s ease",
     },
     footerText: {
-      fontSize: '12px',
-      color: 'rgba(255,255,255,0.5)',
-      textAlign: 'center',
+      fontSize: "12px",
+      color: "rgba(255,255,255,0.5)",
+      textAlign: "center",
       margin: 0,
     },
   };
@@ -164,14 +183,22 @@ export default function UserNavBar() {
             return (
               <button
                 key={item.path}
-                onClick={() => setActiveItem(item.path)}
+                onClick={() => {
+                  setActiveItem(item.path);
+                  navigate(item.path); // ← FIXED NAVIGATION
+                }}
                 style={styles.navButton(isActive)}
               >
                 <div style={styles.iconWrapper(isActive)}>
                   <Icon size={20} />
                 </div>
                 <span style={styles.label(isActive)}>{item.label}</span>
-                {isActive && <ChevronRight size={18} style={{ color: 'white', opacity: isOpen ? 1 : 0 }} />}
+                {isActive && (
+                  <ChevronRight
+                    size={18}
+                    style={{ color: "white", opacity: isOpen ? 1 : 0 }}
+                  />
+                )}
               </button>
             );
           })}
