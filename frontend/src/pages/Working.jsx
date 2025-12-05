@@ -48,7 +48,7 @@ export default function Working() {
     fetchHours();
   }, []);
 
-  /** Loading UI */
+  /*Loading UI */
   if (loading)
     return (
       <Paper
@@ -92,7 +92,7 @@ export default function Working() {
       elevation={0}
       sx={{
         p: 3,
-        borderRadius: 4,
+        borderRadius: 10,
         border: "1px solid #e0e0e0",
         background: "white",
         maxWidth: 400,
@@ -104,7 +104,7 @@ export default function Working() {
         <Box
           sx={{
             backgroundColor: "#f0f4ff",
-            borderRadius: 2,
+            borderRadius: 10,
             p: 1.5,
             display: "flex",
             alignItems: "center",
@@ -123,21 +123,6 @@ export default function Working() {
         </Box>
       </Box>
 
-      {/* Today's  */}
-      <Alert
-        severity={isOpen ? "success" : "info"}
-        icon={isOpen ? <CheckCircleIcon /> : <AccessTimeIcon />}
-        sx={{
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${isOpen ? "#4caf50" : "#2196f3"}`,
-        }}
-      >
-        <Typography sx={{ fontWeight: 600 }}>
-          Today: {today} — {holidayMessage || todayHours}
-        </Typography>
-      </Alert>
-
       {/* Divider */}
       <Box sx={{ height: "1px", backgroundColor: "#e0e0e0", mb: 2 }} />
 
@@ -155,7 +140,7 @@ export default function Working() {
                 display: "flex",
                 justifyContent: "space-between",
                 p: 2,
-                borderRadius: 2,
+                borderRadius: 6,
                 border: isToday ? "2px solid #667eea" : "1px solid #f0f0f0",
                 backgroundColor: isToday ? "#f0f4ff" : "transparent",
               }}

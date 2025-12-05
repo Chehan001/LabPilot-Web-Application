@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 
 export default function UserNavBar() {
@@ -21,17 +22,15 @@ export default function UserNavBar() {
 
   const sidebarRef = useRef();
 
-  // Update active item when route changes
   useEffect(() => {
     setActiveItem(location.pathname);
   }, [location.pathname]);
 
-  // Detect screen size
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 1024);
       if (window.innerWidth > 1024) {
-        setIsOpen(false); 
+        setIsOpen(false);
       }
     };
     handleResize();
@@ -39,7 +38,6 @@ export default function UserNavBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Detect mouse near left edge (desktop only)
   useEffect(() => {
     if (!isMobile) {
       const handleMouseMove = (e) => {
@@ -52,7 +50,6 @@ export default function UserNavBar() {
     }
   }, [isMobile]);
 
-  // Close sidebar when clicking outside (mobile only)
   useEffect(() => {
     if (isMobile && isOpen) {
       const handleClickOutside = (e) => {
@@ -117,7 +114,7 @@ export default function UserNavBar() {
       alignItems: "center",
       gap: "12px",
       padding: "14px 16px",
-      borderRadius: "12px",
+      borderRadius: "15px",
       border: "none",
       cursor: "pointer",
       transition: "all 0.3s ease",
@@ -156,11 +153,32 @@ export default function UserNavBar() {
       textAlign: "center",
       margin: 0,
     },
+
+    logoutBtn: {
+      width: "100%",
+      marginTop: "12px",
+      padding: "12px 16px",
+      borderRadius: "12px",
+      border: "none",
+      background: "rgba(255, 255, 255, 0.12)",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      cursor: "pointer",
+      color: "white",
+      transition: "all 0.3s ease",
+      opacity: isOpen ? 1 : 0,
+    },
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("admin");
+    navigate("/login");
   };
 
   return (
     <>
-      {/* Top bar for mobile */}
       {isMobile && (
         <div style={styles.topBar}>
           <button onClick={() => setIsOpen(!isOpen)}>
@@ -169,7 +187,6 @@ export default function UserNavBar() {
         </div>
       )}
 
-      {/* Sidebar */}
       <div
         ref={sidebarRef}
         style={styles.sidebar}
@@ -185,7 +202,7 @@ export default function UserNavBar() {
                 key={item.path}
                 onClick={() => {
                   setActiveItem(item.path);
-                  navigate(item.path); // ← FIXED NAVIGATION
+                  navigate(item.path);
                 }}
                 style={styles.navButton(isActive)}
               >
@@ -203,6 +220,12 @@ export default function UserNavBar() {
             );
           })}
         </nav>
+
+        {/* Logout Button  */}
+        <button style={styles.logoutBtn} onClick={handleLogout}>
+          <LogOut size={20} />
+          <span style={{ opacity: isOpen ? 1 : 0 }}>Logout</span>
+        </button>
 
         <div style={styles.footer}>
           <p style={styles.footerText}>© 2024 Student Portal</p>
